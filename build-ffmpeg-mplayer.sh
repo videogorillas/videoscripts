@@ -7,8 +7,6 @@
 #  * http://www.haykranen.nl/2007/11/21/howto-install-and-use-ffmpeg-on-mac-os-x-leopard/
 #
 
-
-
 unpack () {
     if [ -f $1 ] ; then
         case $1 in
@@ -29,6 +27,24 @@ unpack () {
         echo "'$1' is not a valid archive file"
     fi
 }
+
+downloadAndCheck(){
+    URL=$1
+    EXPECTED_TYPE=$2
+    FILE_NAME=${URL##*/}
+    echo "Downloading $FILE_NAME"
+    curl -#LO $URL
+    FILE_OUT=`file --mime-type $FILE_NAME`
+    EXPECTED_OUT="${FILE_NAME}: $EXPECTED_TYPE"
+    if [ "$FILE_OUT" != "$EXPECTED_OUT" ];then
+        echo "Downloaded file is of type $FILE_TYPE, which is different from expected $EXPECTED_TYPE.";
+        echo "Check if location $URL contains corresponding file";
+        exit;
+    fi
+}
+
+
+
 
 set -ue
 
@@ -62,54 +78,35 @@ cd ${SOURCES}
 # Download the necessary sources.
 #echo "Downloading faad2-2.7"
 #curl -#LO http://downloads.sourceforge.net/faac/faad2-2.7.tar.gz
-echo "Downloading faac-1.28"
-curl -#LO http://downloads.sourceforge.net/project/faac/faac-src/faac-1.28/faac-1.28.tar.gz
-echo "Downloading lame-3.99"
-curl -#LO http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.tar.gz
-echo "Downloading libogg-1.3.0"
-curl -#LO http://downloads.xiph.org/releases/ogg/libogg-1.3.0.tar.gz
-#curl -#LO http://pkg-config.freedesktop.org/releases/pkg-config-0.25.tar.gz
-echo "Downloading libvorbis-1.3.3"
-curl -#LO http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.gz
-echo "Downloading libtheora-1.1.1"
-curl -#LO http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
-echo "Downloading gsm-1.0.13"
-#curl -#LO http://www.quut.com/gsm/gsm-1.0.13.tar.gz
-# alternatively gsm could be obtained from:
-curl -#LO http://www.imagemagick.org/download/delegates/ffmpeg/gsm-1.0.13.tar.bz2
-echo "Downloading yasm-1.1.0"
-curl -#LO http://www.tortall.net/projects/yasm/releases/yasm-1.1.0.tar.gz
-echo "Downloading libvpx-0.9.7"
-curl -#LO http://webm.googlecode.com/files/libvpx-v0.9.7-p1.tar.bz2
-echo "Downloading latest_stable_x264"
-curl -#LO http://download.videolan.org/pub/videolan/x264/snapshots/last_stable_x264.tar.bz2
-echo "Downloading amrwb-10.0.0.0"
-curl -#LO http://ftp.penguin.cz/pub/users/utx/amr/amrwb-10.0.0.0.tar.bz2
-echo "Downloading amrnb-10.0.0.0"
-curl -#LO http://ftp.penguin.cz/pub/users/utx/amr/amrnb-10.0.0.0.tar.bz2
-echo "Downloading speex-1.2rc1"
-curl -#LO http://downloads.us.xiph.org/releases/speex/speex-1.2rc1.tar.gz
-echo "Downloading flac-1.2.1"
-curl -#LO http://downloads.sourceforge.net/flac/flac-1.2.1.tar.gz
-echo "Downloading vo-aacenc-0.1.1"
-curl -#LO http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.1.tar.gz
-echo "Downloading vo-amrwbenc-0.1.1"
-curl -#LO http://sourceforge.net/projects/opencore-amr/files/vo-amrwbenc/vo-amrwbenc-0.1.1.tar.gz
-echo "Downloading opencore-amr-0.1.2"
-curl -#LO http://sourceforge.net/projects/opencore-amr/files/opencore-amr/0.1.2/opencore-amr-0.1.2.tar.gz
-echo "Downloading xvidcore-1.3.2"
-curl -#LO http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
-echo "Downloading zlib-1.2.5"
-curl -#LO http://zlib.net/zlib-1.2.6.tar.gz
-echo "Downloading bzip2-1.0.6"
-curl -#LO http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz
-echo "Downloading libxavs"
+
+downloadAndCheck "http://downloads.sourceforge.net/faac/faad2-2.7.tar.gz" "application/x-gzip"
+downloadAndCheck "http://downloads.sourceforge.net/project/faac/faac-src/faac-1.28/faac-1.28.tar.gz" "application/x-gzip"
+downloadAndCheck "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.tar.gz" "application/x-gzip"
+downloadAndCheck "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.tar.gz" "application/x-gzip"
+downloadAndCheck "http://downloads.xiph.org/releases/ogg/libogg-1.3.0.tar.gz" "application/x-gzip"
+downloadAndCheck "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.gz" "application/x-gzip"
+downloadAndCheck "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2" "application/x-bzip2"
+downloadAndCheck "http://www.imagemagick.org/download/delegates/ffmpeg/gsm-1.0.13.tar.bz2" "application/x-bzip2"
+downloadAndCheck "http://www.tortall.net/projects/yasm/releases/yasm-1.1.0.tar.gz" "application/x-gzip"
+downloadAndCheck "http://webm.googlecode.com/files/libvpx-v1.1.0.tar.bz2" "application/x-bzip2"
+downloadAndCheck "http://download.videolan.org/pub/videolan/x264/snapshots/last_stable_x264.tar.bz2" "application/x-bzip2"
+downloadAndCheck "http://ftp.penguin.cz/pub/users/utx/amr/amrwb-10.0.0.0.tar.bz2" "application/x-bzip2"
+downloadAndCheck "http://ftp.penguin.cz/pub/users/utx/amr/amrnb-10.0.0.0.tar.bz2" "application/x-bzip2"
+downloadAndCheck "http://downloads.us.xiph.org/releases/speex/speex-1.2rc1.tar.gz" "application/x-gzip"
+downloadAndCheck "http://downloads.sourceforge.net/flac/flac-1.2.1.tar.gz" "application/x-gzip"
+downloadAndCheck "http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.1.tar.gz" "application/x-gzip"
+downloadAndCheck "http://sourceforge.net/projects/opencore-amr/files/vo-amrwbenc/vo-amrwbenc-0.1.1.tar.gz" "application/x-gzip"
+downloadAndCheck "http://sourceforge.net/projects/opencore-amr/files/opencore-amr/0.1.2/opencore-amr-0.1.2.tar.gz" "application/x-gzip"
+downloadAndCheck "http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz" "application/x-gzip"
+downloadAndCheck "http://zlib.net/zlib-1.2.7.tar.gz" "application/x-gzip"
+downloadAndCheck "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz" "application/x-gzip"
+echo "Checking out libxavs"
 svn co https://xavs.svn.sourceforge.net/svnroot/xavs xavs
-echo "Downloading libvpx"
+echo "Checking out libvpx"
 git clone http://git.chromium.org/webm/libvpx.git
-echo "Downloading ffmpeg"
+echo "Checking out ffmpeg"
 git clone git://git.videolan.org/ffmpeg.git
-echo "Downloading mplayer"
+echo "Checking out mplayer"
 svn checkout svn://svn.mplayerhq.hu/mplayer/trunk mplayer
 #echo "Downloading libav"
 #git clone git://git.libav.org/libav.git
@@ -128,11 +125,6 @@ cp -r ${SOURCES}/xavs ${CMPL}/xavs && rm -fr ${SOURCES}/xavs
 cp -r ${SOURCES}/libvpx ${CMPL}/libvpx && rm -fr ${SOURCES}/libvpx
 cp -r ${SOURCES}/ffmpeg ${CMPL}/ffmpeg && rm -fr ${SOURCES}/ffmpeg
 cp -r ${SOURCES}/mplayer ${CMPL}/mplayer && rm -fr ${SOURCES}/mplayer
-
-echo "Building vorbis..."
-cd ${CMPL}/libvorbis-*
-CC=gcc ./configure --prefix=${TARGET} --with-ogg-libraries=${TARGET}/lib --with-ogg-includes=${TARGET}/include/ --enable-static --disable-shared --build=x86_64
-make -j $THREADS && make install
 
 echo "Building xavs..."
 cd ${CMPL}/xavs/trunk
@@ -182,6 +174,11 @@ make -j $THREADS && make install && make install-lib-static
 echo "Building ogg..."
 cd ${CMPL}/libogg-*
 ./configure --prefix=${TARGET} --disable-shared --enable-static
+make -j $THREADS && make install
+
+echo "Building vorbis..."
+cd ${CMPL}/libvorbis-*
+CC=gcc ./configure --prefix=${TARGET} --with-ogg-libraries=${TARGET}/lib --with-ogg-includes=${TARGET}/include/ --enable-static --disable-shared --build=x86_64
 make -j $THREADS && make install
 
 echo "Building theora..."
